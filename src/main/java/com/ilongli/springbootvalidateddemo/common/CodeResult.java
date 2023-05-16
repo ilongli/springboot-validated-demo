@@ -1,32 +1,108 @@
 package com.ilongli.springbootvalidateddemo.common;
 
-import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
 
 /**
- * @author ilongli
- * @date 2022/12/13 15:39
+ * json返回给前端的状态码
+ * 
+ * @author yan
+ * @date 2019年3月18日
  */
-@Data
-public class CodeResult {
+public class CodeResult extends BaseResult {
 
-    {
-        code = 200;
-        msg = "成功";
-    }
+	private static final Logger logger = LoggerFactory.getLogger(CodeResult.class);
 
-    private Integer code;
+	private Object data;
 
-    private String msg;
+	public CodeResult() {
+		super();
+		data = new HashMap<String, Object>();
+	}
 
-    private String data;
+	public CodeResult(CodeEnum code, Object data) {
+		super(code);
+		if (data == null) {
+			data = new HashMap<String, Object>();
+		}
+		this.data = data;
+	}
 
-    public static CodeResult error(String msg) {
+	public CodeResult(Integer code, String msg) {
+		super(code, msg);
+		this.data = null;
+	}
 
-        CodeResult res = new CodeResult();
-        res.setCode(405);
-        res.setMsg(msg);
+	public CodeResult(Integer code, String msg, Object data) {
+		super(code, msg);
+		if (data == null) {
+			data = new HashMap<String, Object>();
+		}
+		this.data = data;
+	}
 
-        return res;
-    }
+	public Object getData() {
+		return data;
+	}
 
+	public void setData(Object data) {
+		this.data = data;
+	}
+
+	/**
+	 * 成功
+	 */
+	public static CodeResult success() {
+		return new CodeResult(CodeEnum.SUCCESS, null);
+	}
+
+	/**
+	 * 成功
+	 * 
+	 * @param data
+	 * @return
+	 */
+	public static CodeResult success(Object data) {
+		return new CodeResult(CodeEnum.SUCCESS, data);
+	}
+
+	/**
+	 * 失败
+	 */
+	public static CodeResult error() {
+		return new CodeResult(CodeEnum.ERROR, null);
+	}
+
+	/**
+	 * 失败
+	 * 
+	 * @param data
+	 * @return
+	 */
+	public static CodeResult error(Object data) {
+		return new CodeResult(CodeEnum.ERROR, data);
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + "[data=" + data + "]";
+	}
+
+	/**
+	 * 根据布尔值返回result
+	 * @author ilongli
+	 */
+	public static CodeResult judge(boolean isSuccess, String errorMsg) {
+		return isSuccess ? new CodeResult(CodeEnum.SUCCESS, null) : new CodeResult(CodeEnum.ERROR, errorMsg);
+	}
+	public static CodeResult judge(boolean isSuccess) {
+		return judge(isSuccess, null);
+	}
+
+
+	public boolean judgeSuccess() {
+		return this.getCode().equals(CodeEnum.SUCCESS.getCode());
+	}
 }
